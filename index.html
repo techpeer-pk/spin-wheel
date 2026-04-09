@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spin the Wheel</title>
+<title>PSG Conference Bhurban – Spin the Wheel</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,11 +31,11 @@
       radial-gradient(ellipse at 50% 50%, rgba(249,115,22,0.06) 0%, transparent 70%);
   }
 
-  /* ── MODAL OVERLAY ── */
+  /* MODAL */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10,4,0,0.85);
+    background: rgba(10,4,0,0.88);
     backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
@@ -60,10 +60,16 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  .modal-logo {
+  .modal-logo { text-align: center; font-size: 38px; margin-bottom: 8px; }
+
+  .modal-event {
     text-align: center;
-    margin-bottom: 6px;
-    font-size: 36px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 4px;
   }
 
   .modal h2 {
@@ -85,14 +91,12 @@
     margin-bottom: 28px;
   }
 
-  .field {
-    margin-bottom: 18px;
-  }
+  .field { margin-bottom: 18px; }
 
   .field label {
     display: block;
-    font-size: 12px;
-    letter-spacing: 1px;
+    font-size: 11px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 8px;
@@ -112,15 +116,19 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .field input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
-  }
-
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
   .field input::placeholder { color: rgba(255,248,238,0.25); }
   .field input.error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.18); }
+
   .error-msg { font-size: 12px; color: #ef4444; margin-top: 5px; display: none; }
   .error-msg.show { display: block; }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 4px;
+  }
 
   .btn-start {
     width: 100%;
@@ -134,14 +142,13 @@
     font-size: 16px;
     font-weight: 800;
     cursor: pointer;
-    letter-spacing: 0.3px;
     box-shadow: 0 4px 24px rgba(245,158,11,0.35);
     transition: opacity 0.2s, transform 0.1s;
   }
   .btn-start:hover { opacity: 0.92; }
   .btn-start:active { transform: scale(0.97); }
 
-  /* ── MAIN WHEEL PAGE ── */
+  /* WHEEL PAGE */
   .wheel-page {
     display: none;
     flex-direction: column;
@@ -149,22 +156,17 @@
     min-height: 100vh;
     padding: 0 20px 32px;
   }
-
   .wheel-page.visible { display: flex; }
 
-  /* Top info bar */
+  /* Top bar */
   .info-bar {
     width: 100%;
-    max-width: 600px;
+    max-width: 640px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-top: none;
     border-radius: 0 0 20px 20px;
-    padding: 14px 24px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    padding: 12px 24px 16px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     animation: dropDown 0.5s cubic-bezier(0.34,1.2,0.64,1);
   }
@@ -172,6 +174,26 @@
   @keyframes dropDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  .event-title-bar {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   .info-item { display: flex; flex-direction: column; gap: 2px; }
@@ -188,14 +210,8 @@
     font-weight: 700;
     color: var(--text);
   }
-
-  .info-divider {
-    width: 1px;
-    height: 36px;
-    background: var(--border);
-  }
-
-  .info-badge {
+  .info-divider { width: 1px; height: 36px; background: var(--border); }
+  .spin-badge {
     background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.15));
     border: 1px solid rgba(245,158,11,0.3);
     border-radius: 99px;
@@ -206,26 +222,35 @@
     white-space: nowrap;
   }
 
-  /* Wheel section */
+  /* Wheel */
   .wheel-section {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 28px;
-    padding: 32px 0;
+    gap: 24px;
+    padding: 28px 0;
   }
 
   .wheel-title {
     font-family: 'Syne', sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
     background: linear-gradient(135deg, var(--accent) 30%, var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-align: center;
+  }
+
+  .wheel-subtitle {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-top: -18px;
   }
 
   .scene {
@@ -323,10 +348,9 @@
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 28px rgba(245,158,11,0.4);
-    transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
-    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
   }
-  .spin-btn:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 6px 36px rgba(245,158,11,0.55); }
+  .spin-btn:hover:not(:disabled) { opacity: 0.9; }
   .spin-btn:active:not(:disabled) { transform: scale(0.96); }
   .spin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
@@ -349,56 +373,141 @@
   }
   .btn-back:hover { color: var(--accent); border-color: var(--accent); }
 
-  @media (max-width: 480px) {
-    .info-bar { flex-wrap: wrap; justify-content: center; }
-    .info-divider { display: none; }
-    .info-badge { width: 100%; text-align: center; }
+  /* CONFETTI CANVAS */
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 200;
   }
+
+  /* WINNER POPUP */
+  .winner-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,4,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 190;
+    padding: 20px;
+    display: none;
+  }
+  .winner-overlay.show { display: flex; }
+
+  .winner-card {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 24px;
+    padding: 40px 36px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(245,158,11,0.3), 0 24px 60px rgba(0,0,0,0.5);
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.6); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .winner-emoji { font-size: 52px; margin-bottom: 12px; }
+
+  .winner-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .winner-result {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .winner-event {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .btn-close-winner {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #1a0a00;
+    border: none;
+    border-radius: 99px;
+    padding: 11px 32px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-close-winner:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
 
-<!-- MODAL -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- MODAL FORM -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-logo">🎰</div>
+    <div class="modal-event">PSG Conference Bhurban</div>
     <h2>Spin the Wheel!</h2>
-    <p class="modal-sub">Apni details fill karo aur spin karo!</p>
+    <p class="modal-sub">Enter your details to get started</p>
 
     <div class="field">
-      <label>Aapka Naam</label>
-      <input type="text" id="nameInput" placeholder="Naam likhein..." maxlength="50" required />
-      <span class="error-msg" id="nameErr">⚠ Naam zaroor bharein!</span>
+      <label>Your Name</label>
+      <input type="text" id="nameInput" placeholder="Enter your name..." maxlength="50" required />
+      <div class="char-count"><span id="nameCount">0</span>/50</div>
+      <span class="error-msg" id="nameErr">⚠ Name is required!</span>
     </div>
     <div class="field">
       <label>Institution</label>
-      <input type="text" id="instInput" placeholder="Institution ka naam..." maxlength="50" required />
-      <span class="error-msg" id="instErr">⚠ Institution zaroor bharein!</span>
+      <input type="text" id="instInput" placeholder="Enter institution name..." maxlength="50" required />
+      <div class="char-count"><span id="instCount">0</span>/50</div>
+      <span class="error-msg" id="instErr">⚠ Institution is required!</span>
     </div>
 
-    <button class="btn-start" onclick="startWheel()">🚀 Chalo Spin Karein!</button>
+    <button class="btn-start" onclick="startWheel()">🚀 Let's Spin!</button>
   </div>
 </div>
 
 <!-- WHEEL PAGE -->
 <div class="wheel-page" id="wheelPage">
-
-  <!-- Top info bar -->
   <div class="info-bar">
-    <div class="info-item">
-      <span class="info-label">Naam</span>
-      <span class="info-value" id="displayName">—</span>
+    <div class="event-title-bar">🏔 PSG Conference Bhurban</div>
+    <div class="info-row">
+      <div class="info-item">
+        <span class="info-label">Name</span>
+        <span class="info-value" id="displayName">—</span>
+      </div>
+      <div class="info-divider"></div>
+      <div class="info-item">
+        <span class="info-label">Institution</span>
+        <span class="info-value" id="displayInst">—</span>
+      </div>
+      <div class="spin-badge" id="spinBadge">0 Spins</div>
     </div>
-    <div class="info-divider"></div>
-    <div class="info-item">
-      <span class="info-label">Institution</span>
-      <span class="info-value" id="displayInst">—</span>
-    </div>
-    <div class="info-badge" id="spinBadge">0 Spins</div>
   </div>
 
   <div class="wheel-section">
     <div class="wheel-title">🎰 Spin the Wheel!</div>
+    <div class="wheel-subtitle">PSG Conference Bhurban</div>
 
     <div class="scene">
       <div class="glow-ring"></div>
@@ -409,13 +518,24 @@
       </div>
     </div>
 
-    <p class="hint" id="hint">Wheel pe click karo ya button dabao!</p>
-    <button class="spin-btn" id="spinBtn" onclick="spin()">🎲 Spin Karo!</button>
+    <p class="hint" id="hint">Click the wheel or press the button to spin!</p>
+    <button class="spin-btn" id="spinBtn" onclick="spin()">🎲 Spin Now!</button>
     <div class="spin-count" id="spinCount"></div>
   </div>
 </div>
 
-<button class="btn-back" id="btnBack" style="display:none;" onclick="goBack()">← Wapas Jao</button>
+<!-- WINNER POPUP -->
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-card">
+    <div class="winner-emoji">🎉</div>
+    <h3>Congratulations!</h3>
+    <div class="winner-result" id="winnerText">—</div>
+    <div class="winner-event">PSG Conference Bhurban</div>
+    <button class="btn-close-winner" onclick="closeWinner()">Spin Again 🎲</button>
+  </div>
+</div>
+
+<button class="btn-back" id="btnBack" style="display:none;" onclick="goBack()">← Back</button>
 
 <script>
   let isSpinning = false;
@@ -428,7 +548,19 @@
   const spinBadge = document.getElementById('spinBadge');
   const spinCountEl = document.getElementById('spinCount');
 
-  // Enter key support
+  // Char counters
+  document.getElementById('nameInput').addEventListener('input', function() {
+    document.getElementById('nameCount').textContent = this.value.length;
+    this.classList.remove('error');
+    document.getElementById('nameErr').classList.remove('show');
+  });
+  document.getElementById('instInput').addEventListener('input', function() {
+    document.getElementById('instCount').textContent = this.value.length;
+    this.classList.remove('error');
+    document.getElementById('instErr').classList.remove('show');
+  });
+
+  // Enter key navigation
   document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('instInput').focus(); });
   document.getElementById('instInput').addEventListener('keydown', e => { if(e.key==='Enter') startWheel(); });
 
@@ -446,7 +578,6 @@
 
     document.getElementById('displayName').textContent = nameEl.value.trim().toUpperCase();
     document.getElementById('displayInst').textContent = instEl.value.trim().toUpperCase();
-
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('wheelPage').classList.add('visible');
     document.getElementById('btnBack').style.display = 'block';
@@ -456,12 +587,12 @@
     document.getElementById('wheelPage').classList.remove('visible');
     document.getElementById('modalOverlay').style.display = 'flex';
     document.getElementById('btnBack').style.display = 'none';
-    spinCount = 0;
-    currentAngle = 0;
+    spinCount = 0; currentAngle = 0;
     img.style.transform = 'rotate(0deg)';
     spinBadge.textContent = '0 Spins';
     spinCountEl.textContent = '';
-    hint.textContent = 'Wheel pe click karo ya button dabao!';
+    hint.textContent = 'Click the wheel or press the button to spin!';
+    hint.classList.remove('active');
   }
 
   function spin() {
@@ -488,14 +619,117 @@
       isSpinning = false;
       btn.disabled = false;
       spinCount++;
-      hint.textContent = 'Phir spin karo!';
-      hint.classList.remove('active');
       spinBadge.textContent = spinCount + ' Spin' + (spinCount > 1 ? 's' : '');
       spinCountEl.textContent = 'Total spins: ' + spinCount;
+      hint.textContent = 'Click to spin again!';
+      hint.classList.remove('active');
+      launchConfetti();
+      setTimeout(showWinner, 600);
     }
-
     requestAnimationFrame(frame);
   }
+
+  function showWinner() {
+    const name = document.getElementById('displayName').textContent;
+    document.getElementById('winnerText').textContent = name;
+    document.getElementById('winnerOverlay').classList.add('show');
+  }
+
+  function closeWinner() {
+    document.getElementById('winnerOverlay').classList.remove('show');
+  }
+
+  // CONFETTI
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animFrame;
+
+  function launchConfetti() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particles = [];
+    const colors = ['#f59e0b','#ef4444','#f97316','#fbbf24','#00e5ff','#ffffff','#fc5c7d','#a78bfa'];
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const origins = [
+      {x: cx, y: cy},
+      {x: cx - 100, y: cy + 80},
+      {x: cx + 100, y: cy + 80}
+    ];
+    for (let i = 0; i < 280; i++) {
+      const origin = origins[i % origins.length];
+      const angle = (Math.random() * 360) * Math.PI / 180;
+      const speed = 8 + Math.random() * 18;
+      particles.push({
+        x: origin.x,
+        y: origin.y,
+        w: 7 + Math.random() * 9,
+        h: 4 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 6,
+        angle: Math.random() * 360,
+        spin: (Math.random() - 0.5) * 12,
+        gravity: 0.4 + Math.random() * 0.3,
+        opacity: 1
+      });
+    }
+    cancelAnimationFrame(animFrame);
+    drawConfetti();
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += p.gravity;
+      p.vx *= 0.98;
+      p.angle += p.spin;
+      if (p.y > canvas.height * 0.75) p.opacity -= 0.03;
+      if (p.opacity > 0 && p.y < canvas.height + 20) {
+        alive = true;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      }
+    });
+    if (alive) animFrame = requestAnimationFrame(drawConfetti);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 </script>
+
+<script>
+  // Disable right click
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+  // Disable left click default actions (text selection etc) - allow button clicks
+  document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
+  // Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, Ctrl+Shift+J, Ctrl+Shift+C
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
+    if (e.ctrlKey && ['U','S'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
+  });
+  // Disable drag
+  document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+  // Disable copy
+  document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
+  // Disable print screen (partial)
+  document.addEventListener('keyup', function(e) {
+    if (e.key === 'PrintScreen') {
+      navigator.clipboard.writeText('');
+    }
+  });
+  // CSS - disable text selection
+  document.documentElement.style.userSelect = 'none';
+  document.documentElement.style.webkitUserSelect = 'none';
+</script>
+
 </body>
 </html>
