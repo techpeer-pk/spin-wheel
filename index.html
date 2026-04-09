@@ -118,6 +118,9 @@
   }
 
   .field input::placeholder { color: rgba(255,248,238,0.25); }
+  .field input.error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.18); }
+  .error-msg { font-size: 12px; color: #ef4444; margin-top: 5px; display: none; }
+  .error-msg.show { display: block; }
 
   .btn-start {
     width: 100%;
@@ -364,11 +367,13 @@
 
     <div class="field">
       <label>Aapka Naam</label>
-      <input type="text" id="nameInput" placeholder="Naam likhein..." maxlength="40" />
+      <input type="text" id="nameInput" placeholder="Naam likhein..." maxlength="40" required />
+      <span class="error-msg" id="nameErr">⚠ Naam zaroor bharein!</span>
     </div>
     <div class="field">
       <label>Institution</label>
-      <input type="text" id="instInput" placeholder="Institution ka naam..." maxlength="60" />
+      <input type="text" id="instInput" placeholder="Institution ka naam..." maxlength="60" required />
+      <span class="error-msg" id="instErr">⚠ Institution zaroor bharein!</span>
     </div>
 
     <button class="btn-start" onclick="startWheel()">🚀 Chalo Spin Karein!</button>
@@ -428,13 +433,19 @@
   document.getElementById('instInput').addEventListener('keydown', e => { if(e.key==='Enter') startWheel(); });
 
   function startWheel() {
-    const name = document.getElementById('nameInput').value.trim();
-    const inst = document.getElementById('instInput').value.trim();
-    if (!name) { document.getElementById('nameInput').focus(); return; }
-    if (!inst) { document.getElementById('instInput').focus(); return; }
+    const nameEl = document.getElementById('nameInput');
+    const instEl = document.getElementById('instInput');
+    const nameErr = document.getElementById('nameErr');
+    const instErr = document.getElementById('instErr');
+    let valid = true;
+    nameEl.classList.remove('error'); nameErr.classList.remove('show');
+    instEl.classList.remove('error'); instErr.classList.remove('show');
+    if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.add('show'); nameEl.focus(); valid = false; }
+    if (!instEl.value.trim()) { instEl.classList.add('error'); instErr.classList.add('show'); if(valid) instEl.focus(); valid = false; }
+    if (!valid) return;
 
-    document.getElementById('displayName').textContent = name;
-    document.getElementById('displayInst').textContent = inst;
+    document.getElementById('displayName').textContent = nameEl.value.trim();
+    document.getElementById('displayInst').textContent = instEl.value.trim();
 
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('wheelPage').classList.add('visible');
