@@ -444,8 +444,8 @@
     if (!instEl.value.trim()) { instEl.classList.add('error'); instErr.classList.add('show'); if(valid) instEl.focus(); valid = false; }
     if (!valid) return;
 
-    document.getElementById('displayName').textContent = nameEl.value.trim();
-    document.getElementById('displayInst').textContent = instEl.value.trim();
+    document.getElementById('displayName').textContent = nameEl.value.trim().toUpperCase();
+    document.getElementById('displayInst').textContent = instEl.value.trim().toUpperCase();
 
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('wheelPage').classList.add('visible');
