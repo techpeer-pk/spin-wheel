@@ -436,6 +436,12 @@
     margin-bottom: 6px;
     line-height: 1.3;
   }
+  .winner-result.loser {
+    background: linear-gradient(135deg, #888, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   .winner-event {
     font-size: 12px;
@@ -623,16 +629,65 @@
       spinCountEl.textContent = 'Total spins: ' + spinCount;
       hint.textContent = 'Click to spin again!';
       hint.classList.remove('active');
-      launchConfetti();
-      setTimeout(showWinner, 600);
+      const result = detectSlice(currentAngle);
+      if (result.isWinner) {
+        launchConfetti();
+      }
+      setTimeout(() => showWinner(result), 600);
     }
     requestAnimationFrame(frame);
   }
 
-  function showWinner() {
+  // Wheel slices - CLOCKWISE from TOP (pointer at 12 o'clock)
+  // Each slice = 45°, 8 slices
+  // Order based on actual image layout reading clockwise from top:
+  const SLICES = [
+    { label: 'Try Again',              isWinner: false, emoji: '😔' },  // 0°–45°
+    { label: 'Winner!',                isWinner: true,  emoji: '🎉' },  // 45°–90°
+    { label: 'Winner!',                isWinner: true,  emoji: '🎊' },  // 90°–135°
+    { label: 'Better Luck Next Time',  isWinner: false, emoji: '😅' },  // 135°–180°
+    { label: 'Winner!',                isWinner: true,  emoji: '🥳' },  // 180°–225°
+    { label: 'Winner!',                isWinner: true,  emoji: '🎁' },  // 225°–270°
+    { label: 'Winner!',                isWinner: true,  emoji: '✨' },  // 270°–315°
+    { label: 'Have a Nice Day',        isWinner: true,  emoji: '😊' },  // 315°–360°
+  ];
+  const SLICE_DEG = 45;
+  // OFFSET = 0: pointer at top aligns with 0° boundary of slice array
+  // No half-offset needed since pointer is at the exact boundary start
+  const OFFSET = 0;
+
+  function detectSlice(angleDeg) {
+    // Pointer is at TOP (0°/360°).
+    // As wheel rotates CW by X degrees, a slice originally at -X comes to top.
+    // Normalize: which original angle is now under the pointer?
+    const rotated = angleDeg % 360;
+    const normalized = (360 - rotated + OFFSET) % 360;
+    const idx = Math.floor(normalized / SLICE_DEG) % SLICES.length;
+    return { ...SLICES[idx], idx };
+  }
+
+  function showWinner(result) {
     const name = document.getElementById('displayName').textContent;
-    document.getElementById('winnerText').textContent = name;
-    document.getElementById('winnerOverlay').classList.add('show');
+    const overlay = document.getElementById('winnerOverlay');
+    const winnerText = document.getElementById('winnerText');
+    const winnerCard = overlay.querySelector('.winner-card');
+
+    winnerText.textContent = result.label;
+    winnerText.classList.toggle('loser', !result.isWinner);
+
+    if (result.isWinner) {
+      winnerCard.style.borderColor = 'var(--accent)';
+      overlay.querySelector('.winner-emoji').textContent = result.emoji;
+      overlay.querySelector('h3').textContent = 'Congratulations ' + name + '!';
+      overlay.querySelector('.btn-close-winner').textContent = 'Spin Again 🎲';
+    } else {
+      winnerCard.style.borderColor = '#555';
+      overlay.querySelector('.winner-emoji').textContent = result.emoji;
+      overlay.querySelector('h3').textContent = 'Oops, ' + name + '!';
+      overlay.querySelector('.btn-close-winner').textContent = 'Try Again 🎲';
+    }
+
+    overlay.classList.add('show');
   }
 
   function closeWinner() {
