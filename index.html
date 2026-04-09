@@ -570,6 +570,19 @@
   document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('instInput').focus(); });
   document.getElementById('instInput').addEventListener('keydown', e => { if(e.key==='Enter') startWheel(); });
 
+  // ── Google Sheet Integration ──────────────────────────────
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwKXf1WOdNx2g-lRu0e8rZ5O089pW-UX18mXap8cZ73Dm7BnMUVyALkSqSq_C1nvzfsYg/exec';
+
+  function saveToSheet(name, institution) {
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, institution: institution })
+    }).catch(function() {}); // silently ignore errors
+  }
+  // ─────────────────────────────────────────────────────────
+
   function startWheel() {
     const nameEl = document.getElementById('nameInput');
     const instEl = document.getElementById('instInput');
@@ -582,8 +595,14 @@
     if (!instEl.value.trim()) { instEl.classList.add('error'); instErr.classList.add('show'); if(valid) instEl.focus(); valid = false; }
     if (!valid) return;
 
-    document.getElementById('displayName').textContent = nameEl.value.trim().toUpperCase();
-    document.getElementById('displayInst').textContent = instEl.value.trim().toUpperCase();
+    const name = nameEl.value.trim();
+    const institution = instEl.value.trim();
+
+    // Save to Google Sheet (background mein, user ko wait nahi karwata)
+    saveToSheet(name, institution);
+
+    document.getElementById('displayName').textContent = name.toUpperCase();
+    document.getElementById('displayInst').textContent = institution.toUpperCase();
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('wheelPage').classList.add('visible');
     document.getElementById('btnBack').style.display = 'block';
