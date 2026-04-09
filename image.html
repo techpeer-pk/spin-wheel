@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Spin Wheel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0a0a0f;
+    color: #f0eeff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(124,92,252,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(252,92,125,0.10) 0%, transparent 60%);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #f0eeff 40%, #7c5cfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .scene {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Glow ring */
+  .glow-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: conic-gradient(#7c5cfc, #fc5c7d, #5cf0b4, #fcb85c, #7c5cfc);
+    animation: rotateSlow 4s linear infinite;
+    opacity: 0.5;
+  }
+  .glow-ring::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #0a0a0f;
+  }
+
+  @keyframes rotateSlow { to { transform: rotate(360deg); } }
+
+  /* Wheel container */
+  .wheel-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+    box-shadow: 0 0 40px rgba(124,92,252,0.3);
+    transition: box-shadow 0.3s;
+  }
+
+  .wheel-container:hover { box-shadow: 0 0 60px rgba(124,92,252,0.5); }
+
+  #wheelImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+    transition: transform 0.05s linear;
+    will-change: transform;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Upload overlay when no image */
+  .upload-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #12121a;
+    border: 2px dashed rgba(124,92,252,0.4);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    z-index: 2;
+  }
+
+  .upload-overlay:hover { border-color: #7c5cfc; background: #1a1a26; }
+
+  .upload-overlay.hidden { display: none; }
+
+  .upload-icon {
+    font-size: 40px;
+    opacity: 0.7;
+  }
+
+  .upload-text {
+    font-size: 14px;
+    color: rgba(240,238,255,0.6);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .upload-text span {
+    display: block;
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 4px;
+  }
+
+  #fileInput { display: none; }
+
+  /* Pointer / ticker */
+  .pointer {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 28px solid #fff;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+    z-index: 10;
+  }
+
+  /* Click hint */
+  .hint {
+    font-size: 13px;
+    color: rgba(240,238,255,0.4);
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+
+  /* Change image button */
+  .btn-change {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 99px;
+    color: rgba(240,238,255,0.5);
+    font-size: 12px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+    display: none;
+  }
+  .btn-change:hover { border-color: #7c5cfc; color: #7c5cfc; }
+  .btn-change.visible { display: inline-block; }
+
+  /* Spin count badge */
+  .spin-badge {
+    font-size: 12px;
+    color: rgba(240,238,255,0.35);
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Image Spin Wheel</h1>
+
+<div class="scene">
+  <div class="glow-ring"></div>
+
+  <div class="wheel-container" id="wheelContainer" onclick="handleClick()">
+    <!-- Upload overlay -->
+    <div class="upload-overlay" id="uploadOverlay" onclick="triggerUpload(event)">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text">
+        Image upload karo
+        <span>Click to browse</span>
+      </div>
+    </div>
+
+    <img id="wheelImg" src="" alt="Wheel" style="display:none;" />
+    <div class="pointer"></div>
+  </div>
+</div>
+
+<div class="hint" id="hint">Image upload karo pehle</div>
+<button class="btn-change" id="btnChange" onclick="triggerUpload(event)">🔄 Image Badlo</button>
+<div class="spin-badge" id="spinBadge"></div>
+
+<input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)" />
+
+<script>
+  let isSpinning = false;
+  let currentAngle = 0;
+  let spinCount = 0;
+  let hasImage = false;
+
+  const wheelImg = document.getElementById('wheelImg');
+  const uploadOverlay = document.getElementById('uploadOverlay');
+  const hint = document.getElementById('hint');
+  const btnChange = document.getElementById('btnChange');
+  const spinBadge = document.getElementById('spinBadge');
+
+  function triggerUpload(e) {
+    e.stopPropagation();
+    document.getElementById('fileInput').click();
+  }
+
+  function loadImage(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      wheelImg.src = ev.target.result;
+      wheelImg.style.display = 'block';
+      uploadOverlay.classList.add('hidden');
+      hint.textContent = 'Wheel pe click karo — Spin!';
+      btnChange.classList.add('visible');
+      hasImage = true;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function handleClick() {
+    if (!hasImage || isSpinning) return;
+    spin();
+  }
+
+  function spin() {
+    isSpinning = true;
+    hint.textContent = 'Spinning... 🌀';
+
+    const extraRotation = 360 * (5 + Math.floor(Math.random() * 5)) + Math.random() * 360;
+    const targetAngle = currentAngle + extraRotation;
+    const duration = 3500 + Math.random() * 1500;
+    const startTime = performance.now();
+    const startAngle = currentAngle;
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 4);
+    }
+
+    function frame(now) {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = easeOut(t);
+      currentAngle = startAngle + (targetAngle - startAngle) * eased;
+      wheelImg.style.transform = `rotate(${currentAngle}deg)`;
+
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        currentAngle = currentAngle % 360;
+        isSpinning = false;
+        spinCount++;
+        hint.textContent = 'Phir spin karo — click karo!';
+        spinBadge.textContent = `Spins: ${spinCount}`;
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+</script>
+</body>
+</html>
