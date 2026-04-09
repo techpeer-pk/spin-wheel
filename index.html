@@ -629,39 +629,34 @@
       spinCountEl.textContent = 'Total spins: ' + spinCount;
       hint.textContent = 'Click to spin again!';
       hint.classList.remove('active');
-      const result = detectSlice(currentAngle);
-      if (result.isWinner) {
-        launchConfetti();
-      }
-      setTimeout(() => showWinner(result), 600);
+      launchConfetti();
     }
     requestAnimationFrame(frame);
   }
 
   // Wheel slices - CLOCKWISE from TOP (pointer at 12 o'clock)
   // Each slice = 45°, 8 slices
-  // Order based on actual image layout reading clockwise from top:
+  // Order based on actual wheel image (Spin_the_Wheel.png) clockwise from top:
   const SLICES = [
-    { label: 'Try Again',              isWinner: false, emoji: '😔' },  // 0°–45°
-    { label: 'Winner!',                isWinner: true,  emoji: '🎉' },  // 45°–90°
-    { label: 'Winner!',                isWinner: true,  emoji: '🎊' },  // 90°–135°
-    { label: 'Better Luck Next Time',  isWinner: false, emoji: '😅' },  // 135°–180°
-    { label: 'Winner!',                isWinner: true,  emoji: '🥳' },  // 180°–225°
-    { label: 'Winner!',                isWinner: true,  emoji: '🎁' },  // 225°–270°
-    { label: 'Winner!',                isWinner: true,  emoji: '✨' },  // 270°–315°
-    { label: 'Have a Nice Day',        isWinner: true,  emoji: '😊' },  // 315°–360°
+    { label: 'Congratulations!',     isWinner: true,  emoji: '🎉' },  // 0°–45°   (white)
+    { label: 'Try Again',            isWinner: false, emoji: '😔' },  // 45°–90°  (purple)
+    { label: 'Congratulations!',     isWinner: true,  emoji: '🎊' },  // 90°–135° (white)
+    { label: 'Better Luck Next Time',isWinner: false, emoji: '😅' },  // 135°–180° (light purple)
+    { label: 'Congratulations!',     isWinner: true,  emoji: '🥳' },  // 180°–225° (white)
+    { label: 'Congratulations!',     isWinner: true,  emoji: '🎁' },  // 225°–270° (purple)
+    { label: 'Congratulations!',     isWinner: true,  emoji: '✨' },  // 270°–315° (white)
+    { label: 'Have a Nice Day',      isWinner: false, emoji: '😊' },  // 315°–360° (light purple)
   ];
   const SLICE_DEG = 45;
-  // OFFSET = 0: pointer at top aligns with 0° boundary of slice array
-  // No half-offset needed since pointer is at the exact boundary start
-  const OFFSET = 0;
 
   function detectSlice(angleDeg) {
-    // Pointer is at TOP (0°/360°).
-    // As wheel rotates CW by X degrees, a slice originally at -X comes to top.
-    // Normalize: which original angle is now under the pointer?
-    const rotated = angleDeg % 360;
-    const normalized = (360 - rotated + OFFSET) % 360;
+    // Pointer is fixed at TOP (12 o'clock).
+    // When wheel rotates CW by X degrees, the slice that was X degrees
+    // clockwise from top comes under the pointer.
+    // We reverse: which original slice is now at top?
+    const rotated = ((angleDeg % 360) + 360) % 360;
+    // Subtract half-slice to center detection (avoid landing exactly on boundary)
+    const normalized = (rotated - 22.5 + 360) % 360;
     const idx = Math.floor(normalized / SLICE_DEG) % SLICES.length;
     return { ...SLICES[idx], idx };
   }
